@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Наши контакты
+{% endblock %}
+
+{% block content %}
+<h3>Наши контакты:</h3>
+<br>
+<h5>Адрес:</h5>
+<h6>г. Ефремов, ул. Свердлова, 55</h6>
+<br>
+<h5>Телефон(для заказов):</h5>
+<a href="tel:9605555555">(960) 555-55-55</a>
+<br><br>
+<h5>Телефон(старший менеджер):</h5>
+<a href="tel:9605554433">(960) 555-44-33</a>
+<br><br>
+<h5> Схема проезда:</h5>
+<div style="position:relative;overflow:hidden;">
+    <a href="https://yandex.ru/maps/10828/efremov/?utm_medium=mapframe&utm_source=maps" style="color:#eee;font-size:12px;position:absolute;top:0px;">Ефремов</a>
+    <a href="https://yandex.ru/maps/10828/efremov/house/ulitsa_sverdlova_55/Z0EYdwZjQEECQFtpfX11d3xqYA==/?from=mapframe&ll=38.114188%2C53.146079&source=mapframe&utm_medium=mapframe&utm_source=maps&z=18.91" style="color:#eee;font-size:12px;position:absolute;top:14px;">Улица Свердлова, 55 — Яндекс Карты</a>
+    <iframe src="https://yandex.ru/map-widget/v1/-/CCUfiWds0B" width="560" height="400" frameborder="1" allowfullscreen="true" style="position:relative;"></iframe>
+</div>
+{% endblock %}

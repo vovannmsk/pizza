@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    отзыв о продукте
+{% endblock %}
+
+{% block listOfProduct %}
+    <div class="row">
+        <div class = "col-md-6">
+            <h3>Отзыв:</h3>
+            <br>
+                <div class="card">
+                  <div class="card-header">
+                    {{feedback.buyer}}
+                  </div>
+                  <div class="card-body">
+                    <p class="card-text">{{feedback.product}}</p>
+                  </div>
+                  <br>
+                  <div class="card-body">
+                    <p class="card-text">{{feedback.comment}}</p>
+                  </div>
+                </div>
+                <br>
+        </div>
+    </div>
+{% endblock %}

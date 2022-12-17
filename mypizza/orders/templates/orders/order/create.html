@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+ 
+{% block title %}
+    Оформление заказа
+{% endblock %}
+ 
+{% block content%}
+    <div class="container mt-3">
+         <div class="row">
+             <div class = "col-lg-4 col-sm-8">
+                <div class="text-bg-secondary p-2">
+                    <h3>Оформление заказа</h3>
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    {% for f in form %}
+                        <label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>
+                        {{ f }}
+                        <div class="form-error">{{ f.errors }}</div>
+                    {% endfor %}
+                    <div class="btn-order">
+                        <button type="submit" class="btn btn-primary btn-lg"> Разместить заказ </button>
+                    </div>
+                </form>
+             </div>
+             <div class = "col-lg-6 col-sm-12">
+                <div class="text-bg-secondary p-2">
+                    <h3>Ваш заказ</h3>
+                </div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Наименование продукта</th>
+                      <th scope="col">Количество</th>
+                      <th scope="col">Цена продукта</th>
+                      <th scope="col">Итоговая цена</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in cart %}
+                        <tr>
+                            <td>  {{ item.product }}   </td>
+                            <td>  {{ item.quantity }}   </td>
+                            <td class="num">  {{ item.price }}руб.  </td>
+                            <td class="num">  {{ item.total_price }}руб.  </td>
+                        </tr>
+                    {% endfor %}
+                    <tr class="total">
+                        <td>Всего:</td>
+                        <td colspan="2"></td>
+                        <td class="num">  {{ cart.get_total_price }}руб.  </td>
+                    </tr>
+                  </tbody>
+                </table>
+             </div>
+         </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{title}}
+{% endblock %}
+
+{% block content %}
+    <h1>Введите Ваши данные для регистрации:</h1>
+    <br>
+    <form method="post">
+        <div class = "row">
+            <div class="col-sm-6">
+                <div class="mb-3">
+                    {% csrf_token %}
+                    {% for f in form %}
+                        <label class="form-label" for="{{ f.id_for_label }}">{{f.label}}: </label>
+                        {{ f }}
+                        <div class="form-error">{{ f.errors }}</div>
+                        <br>
+                    {% endfor %}
+                    <br><br>
+                    <button type="submit" class="btn btn-primary btn-lg"> Регистрация </button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+
+{% endblock %}

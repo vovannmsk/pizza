@@ -1,0 +1,113 @@
+<!doctype html>
+{% load static %}
+
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title> {% block title %}Пиццерия -=4 сыра=-{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.1/vue.js" integrity="sha512-P28EOrljM7l5/DKqt9dMpmDcmoQsLd6gEpgBMQcbsMg2IqtuSM7YqrfRdWwKJEHYhlEq7KjujU1p0SrT7heRUw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.1/axios.js" integrity="sha512-SXo2rCaEJmbAPoxtaSjW+/hLaVCMAJ1CX8XnIP02x6/LIaWQp4GipKxQhBwL8Tn5U/K+lD9AaM4f4mXJdKnDQw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body link="White">
+
+{% block verbatim %}
+
+{% endblock %}
+
+
+<!--  корзина  -->
+<div align="right" class="cart">
+    {% with total_items=cart|length %}
+    {% if cart|length > 0 %}
+    <br>
+    <p>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#modal-cart">
+            <i class="fa-solid fa-cart-shopping fa-xl"></i>
+        </a>
+        {{ cart.get_total_price }} руб.
+    </p>
+    <!-- Modal -->
+    <div class="modal fade" id="modal-cart" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Ваша корзина</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th scope="col">Фото</th>
+                            <th scope="col">Наименование продукта</th>
+                            <th scope="col">Количество</th>
+                            <th scope="col">Цена продукта</th>
+                            <th scope="col">Итоговая цена</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in cart %}
+                        {% with product=item.product %}
+                        <tr>
+                            <td scope="row">
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img src="{% if product.photo.url %}{{ product.photo.url }}{% else %}{% static 'photo/no_image.png' %}{% endif %}"
+                                         width="100" height="100">
+                                </a>
+                            </td>
+                            <td> {{ product.name }}</td>
+                            <td>
+                                {{item.quantity}}
+                            </td>
+                            <td class="num"> {{ item.price }}руб.</td>
+                            <td class="num"> {{ item.total_price }}руб.</td>
+                        </tr>
+                        {% endwith %}
+                        {% endfor %}
+                        <tr class="total">
+                            <td>Total</td>
+                            <td colspan="3"></td>
+                            <td class="num"> {{ cart.get_total_price }}руб.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <a class="btn btn-primary" href="{% url 'list' %}" role="button">Продолжить покупки</a>
+                    <a class="btn btn-primary" href="{% url 'cart_detail' %}" role="button">Оформить заказ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <br>
+    <p><i class="fa-solid fa-cart-shopping fa-xl"></i> 0 руб.</p>
+    {% endif %}
+    {% endwith %}
+</div>
+
+{% include 'inc/_nav.html' %}
+
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-md-3">
+            {% block sidebar %} {% endblock %}
+        </div>
+        <div class="col-md-9">
+            {% block listOfProduct %} {% endblock %}
+        </div>
+    </div>
+</div>
+
+{% block content %} {% endblock %}
+
+<script src="https://kit.fontawesome.com/b0840eddd5.js" crossorigin="anonymous"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'app.js' %}"></script>
+</body>
+</html>

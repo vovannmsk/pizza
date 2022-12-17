@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block sidebar %}
+{% include 'inc/_sidebar.html' %}
+{% endblock %}
+
+{% block listOfProduct %}
+    <div class="row">
+        <div class = "col-md-3">
+            <div class="card">
+                <img src= {{pizza_item.photo.url}}  class = "card-img-top" height="188" alt="{{pizza_item.shortName}}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ pizza_item.name}}</h5>
+                    <p class="card-text">Ингредиенты: {{pizza_item.ingredients}}</p>
+                    <p class="card-text">Цена: {{pizza_item.currentPrice|floatformat:0}} руб.</p>
+                    <form action="{% url 'cart_add' pizza_item.pk %}" method="post">
+                        <p class="card-text">{{ cart_product_form }}</p>
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary" value="Добавить в корзину">
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <div class = "col-md-6">
+            <h3>Отзывы:</h3>
+            <br>
+            {% for feedback in feedbacks %}
+                <div class="card">
+                  <div class="card-header">
+                    {{feedback.buyer}}
+                  </div>
+                  <div class="card-body">
+                    <p class="card-text">{{feedback.comment}}</p>
+                  </div>
+                </div>
+                <br>
+            {% endfor%}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,118 @@
+html {
+    font-size:16px;
+}
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #ffe0b2;
+    font-size:16px;
+    font-weight:400;
+    color:#000;
+    min-weight:320px;
+}
+
+img {
+    max-width: 100%;
+    max-height:100%;
+}
+
+
+/*  product card */
+
+.card {
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,0.06);
+    transition: all .3s;
+}
+
+.card:hover {
+    box-shadow: 0 14px 30px -15px rgba(0,0,0,0.75);
+}
+
+.product-thumb a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    padding: 20px;
+}
+
+.product-thumb img {
+    max-width: 100%
+    max-height: 100%;
+}
+
+.product-details {
+    padding:20px;
+}
+
+.product-details h4 {
+    font-weight: 500;
+    display: block;
+    height: 60px;
+    overflow: hidden;
+}
+
+.product-details p {
+    font-size:15px;
+    margin-bottom:20px;
+    color: #999;
+    height: 44px;
+    overflow: hidden;
+}
+
+.product-details h5 {
+    font-size:18px;
+    color: #ee6e73;
+    font-weight: 600;
+}
+
+.product-bottom {
+    overflow:hidden;
+    padding: 20px;
+}
+
+.quantity p {
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+/*  sidebar */
+.list-group {
+    margin-bottom:20px;
+}
+
+.btn-order {
+    margin-top:25px;
+    margin-bottom:40px;
+}
+
+.total {
+    font-size:18px;
+    font-weight: 700;
+}
+
+.table th {
+    vertical-align: middle;
+}
+
+.form-label {
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+/* my carousel*/
+
+.my-carousel {
+    padding: 0px;
+}
+
+.my-carousel .carousel-item {
+    max-height: 1080px;
+}
+
+.my-carousel .carousel-item img {
+    object-fit: cover;
+}
+
+.carousel-caption {
+    color: #ffff00;
+}

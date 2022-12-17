@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Спасибо! Заказ принят.
+{% endblock %}
+
+{% block content %}
+     <div class="container mt-2">
+         <div class="row">
+             <div class = "col-6 col-sm-12">
+                <div class="alert alert-success" role="alert">
+                    <h1 class="alert-heading">Спасибо!</h1>
+                    <p>Ваш заказ принят. Он будет доставлен по Вашему адресу в течение 30 минут.
+                    <p>Номер заказа <strong>{{ order.id }}</strong>.</p>
+                    <hr>
+                    <p class="mb-0"> По любому вопросу, касающемуся Вашего заказа, звоните на тел. (905) 123-45-67 </p>
+                </div>
+             </div>
+         </div>
+     </div>
+{% endblock %}
