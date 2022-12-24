@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse_lazy
 from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.text import slugify
+from django.contrib.auth.models import User
 
 class Pizza(models.Model):
     name = models.CharField(max_length=100, db_index=True, verbose_name='Наименование продукта')
@@ -19,7 +20,7 @@ class Pizza(models.Model):
     # со страничкой данного товара.
     # в скобочках функции reverse_lazy мы строим маршрут из urls.py
     def get_absolute_url(self):
-        return reverse_lazy('show_product', kwargs={"product_id": self.pk})
+       return reverse_lazy('show_product', kwargs={"product_id": self.pk})
 
     def __str__(self):
         return self.name
@@ -77,10 +78,14 @@ class Buyers(models.Model):
 
 
 class Feedbacks(models.Model):
+    """Отзывы"""
     buyer = models.CharField(max_length=100, db_index=True, null=True, verbose_name='Имя')       #default="Анонимный покупатель"
 #    buyersname = models.ForeignKey('Buyers', on_delete=models.PROTECT, verbose_name='Имя покупателя', null=True, default=1)
-    product = models.ForeignKey('Pizza', on_delete=models.PROTECT, verbose_name='Наменование продукта', null=True)
+    product = models.ForeignKey('Pizza', on_delete=models.PROTECT, verbose_name='Наменование продукта', null=True,
+                                related_name="feedbacks")
     comment = models.CharField(max_length=250, db_index=False, verbose_name='Отзыв')
+    user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Пользователь', null=True,
+                                related_name='users')
 
     def get_absolute_url(self):
         return reverse_lazy('show_feedback', kwargs={"feedback_id": self.pk})

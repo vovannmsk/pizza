@@ -12,15 +12,11 @@
 {% block listOfProduct %}
 {% verbatim %}
 <div class="container" id="list_apps">
-    <div class="row">
-
-        <div v-for="item in products">
-
-
+    <div class="row" v-for="item in products">
         <div class="col-lg-4 col-sm-6 mb-2">
             <div class="card">
                 <div class="card-img-top product-thumb">
-                    <a :href="item.get_absolute_url"><img :src="item.photo.url" :alt="item.name"> </a>
+                    <a href="/product/1/"><img :src="item.photo" :alt="item.name"> </a>
                 </div>
                 <div class="card-body product-details">
                     <h4 class="card-title">{{ item.name }}</h4>
@@ -42,8 +38,6 @@
                 </div>
             </div>
         </div>
-        </div>
-
     </div>
 </div>
 {% endverbatim %}

@@ -81,6 +81,38 @@ img {
 }
 
 .btn-order {
-    margin:15px;
-    padding-top:15px;
+    margin-top:25px;
+    margin-bottom:40px;
+}
+
+.total {
+    font-size:18px;
+    font-weight: 700;
+}
+
+.table th {
+    vertical-align: middle;
+}
+
+.form-label {
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+/* my carousel*/
+
+.my-carousel {
+    padding: 0px;
+}
+
+.my-carousel .carousel-item {
+    max-height: 1080px;
+}
+
+.my-carousel .carousel-item img {
+    object-fit: cover;
+}
+
+.carousel-caption {
+    color: #ffff00;
 }

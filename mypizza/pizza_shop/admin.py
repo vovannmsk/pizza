@@ -26,8 +26,9 @@ class BuyersAdmin(admin.ModelAdmin):
 
 
 class FeedbacksAdmin(admin.ModelAdmin):
-    list_display = ('id', 'buyer', 'product', 'comment')
+    list_display = ('id', 'buyer', 'product', 'comment', 'user')
     list_display_links = ('id', 'buyer', 'product')
+    ordering = ('-id',)
 
 
 admin.site.register(Pizza, PizzaAdmin)

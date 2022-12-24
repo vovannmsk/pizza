@@ -1,38 +1,171 @@
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
-from django.shortcuts import render, get_object_or_404, redirect
-from django.urls import reverse_lazy
-from django.views.decorators.http import require_POST
-from rest_framework.viewsets import ModelViewSet
-
-from .models import Pizza, TypeOfProduct, Feedbacks, Buyers
+from django.shortcuts import render, redirect
+# from django.urls import reverse_lazy
+# from django.views.decorators.http import require_POST
+# from .models import Pizza, TypeOfProduct, Feedbacks, Buyers
 from cart.forms import CartAddProductForm
 
 from django.views.generic import ListView, DetailView, CreateView
 from .forms import *
-from .serializers import PizzaSerializer
+
+from .serializers import PizzaSerializer, ProductDetailSerializer, FeedbackCreateSerializer, CategoriesSerializer, \
+    FeedbackViewSerializer
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
+
+# =====================================================================================================================
+# вывод данных с помощью метода def
+# =====================================================================================================================
+def list_app(request):
+    return render(request, 'pizza_shop/list_app.html')
 
 
-# основная страница
+# =====================================================================================================================
+# вывод данных с помощью классов APIView
+# =====================================================================================================================
+class PizzaList(APIView):
+    """Вывод всех продуктов через serializer"""
+
+    def get(self, request):
+        products = Pizza.objects.filter(is_ready=True)
+        serializer = PizzaSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class ProductDetailView(APIView):
+    """Вывод сведений по одному товару (вместе с отзывами по нему)"""
+
+    def get(self, request, pk):
+        product = Pizza.objects.get(id=pk)
+        serializer = ProductDetailSerializer(product)
+        return Response(serializer.data)
+
+
+class ProductsFromCategory(APIView):
+    """Вывод всех продуктов одной категории через serializer"""
+
+    def get(self, request, pk):
+        products = Pizza.objects.filter(is_ready=True, type_product=pk).order_by('id')
+        serializer = PizzaSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class ListOfCategories(APIView):
+    """Вывод всех категорий продуктов через serializer"""
+
+    def get(self, request):
+        categories = TypeOfProduct.objects.all().order_by('id')
+        serializer = CategoriesSerializer(categories, many=True)
+        return Response(serializer.data)
+
+
+class FeedbackCreate(APIView):
+    """создание отзыва из формы"""
+
+    def post(self, request):
+        feedback = FeedbackCreateSerializer(data=request.data)
+        feedback.is_valid(raise_exception=True)
+        feedback.save(user=self.request.user)
+        # сохраняем проверенные данные в базе, при этом полю user присваиваем значение текущего зарегистрированного
+        # пользователя (self.request.user)
+        return Response({'post': feedback.data})
+        # другой вариант записи
+        # if feedback.is_valid():
+        #     feedback.save()
+        # return Response(status=201)
+
+
+class FeedbackView(APIView):
+    """вывод отзывов на один товар"""
+
+    def get(self, request, pk):
+        feedback = Feedbacks.objects.filter(product=pk).order_by('id')
+        serializer = FeedbackViewSerializer(feedback, many=True)
+        return Response(serializer.data)
+
+
+# =====================================================================================================================
+# вывод данных с помощью классов GenericAPIView
+# =====================================================================================================================
+class PizzaList2(ListAPIView):
+    """Вывод всех продуктов через serializer"""
+    queryset = Pizza.objects.filter(is_ready=True)
+    serializer_class = PizzaSerializer
+
+
+class ProductDetailView2(RetrieveAPIView):
+    """Вывод сведений по одному товару (вместе с отзывами по нему)"""
+    queryset = Pizza.objects.all()
+    serializer_class = ProductDetailSerializer
+
+
+class ProductsFromCategory2(ListAPIView):
+    """Вывод всех продуктов одной категории через serializer"""
+    serializer_class = PizzaSerializer
+
+    def get_queryset(self):
+        """'этот метод вместо строки queryset = ... """
+        return Pizza.objects.filter(is_ready=True, type_product=self.kwargs["type_product"]).order_by('id')
+
+
+class ListOfCategories2(ListAPIView):
+    """Вывод всех категорий продуктов через serializer"""
+    queryset = TypeOfProduct.objects.all().order_by('id')
+    serializer_class = CategoriesSerializer
+
+
+class FeedbackCreate2(CreateAPIView):
+    """создание отзыва для выбранного товара"""
+    serializer_class = FeedbackCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    # def post(self, request):
+    #     feedback = FeedbackCreateSerializer(data=request.data)
+    #     feedback.is_valid(raise_exception=True)
+    #     feedback.save(user=self.request.user)  # весь метод нужен из-за этой строки
+    #     return Response({'post': feedback.data})
+
+    def perform_create(self, serializer):
+        """переопределил метод, чтобы полю user присвоить значение актуального юзера"""
+        serializer.save(user=self.request.user)
+
+
+class FeedbackView2(ListAPIView):
+    """вывод отзывов на один товар"""
+    serializer_class = FeedbackViewSerializer
+
+    def get_queryset(self):
+        """'этот метод вместо строки queryset = ... """
+        return Feedbacks.objects.filter(product=self.kwargs["product"]).order_by('id')
+
+
+# =====================================================================================================================
+# вывод данных с помощью ViewSet
+# =====================================================================================================================
+class ListAllProducts(ModelViewSet):
+    queryset = Pizza.objects.filter(is_ready=True)
+    serializer_class = PizzaSerializer
+
+# =====================================================================================================================
+# ====================================== ОБЫЧНЫЕ VIEWS БЕЗ ИСПОЛЬЗОВАНИЯ REST_FRAMEWORKS ==============================
+# =====================================================================================================================
+
 def pizza_main(request):
+    """Основная страница"""
     context = {
         'cart_product_form': CartAddProductForm(),  # передаём корзину в html
         'title': 'Пиццерия',
     }
     return render(request, 'pizza_shop/pizza_main.html', context)
 
-# подготовка данных для list.html с помощью DjangoRestFramework
-class ListAllProducts(ModelViewSet):
-    queryset = Pizza.objects.filter(is_ready=True)
-    serializer_class = PizzaSerializer
-
-def list_app(request):
-    return render(request, 'pizza_shop/list_app.html')
-
-
 
 # получение полного списка продуктов, доступных для заказа (с помощью класса)
 class List_Of_Product(ListView):
+    """получение полного списка продуктов, доступных для заказа (с помощью класса)"""
     paginate_by = 3
     model = Pizza
     template_name = 'pizza_shop/list.html'
@@ -51,6 +184,7 @@ class List_Of_Product(ListView):
 
 # получение списка продуктов одной категории, доступных для заказа (с помощью класса)
 class List_Product_Category(ListView):
+    """получение списка продуктов одной категории, доступных для заказа (с помощью класса)"""
     paginate_by = 3
     model = Pizza
     template_name = 'pizza_shop/list.html'
@@ -74,8 +208,8 @@ class List_Product_Category(ListView):
 #       В urls.py должен быть <int:type_slug> вместо <int:type_id>
 
 
-# просмотр одного товара вместе с отзывами по нему (с помощью класса)
 class ShowProduct(DetailView):
+    """просмотр одного товара вместе с отзывами по нему (с помощью класса)"""
     model = Pizza
     template_name = 'pizza_shop/show_product.html'
     pk_url_kwarg = 'product_id'  # название параметра, который передаёт в класс id (или pk)
@@ -91,8 +225,8 @@ class ShowProduct(DetailView):
         return context
 
 
-# добавление нового отзыва
 class AddFeedback(CreateView):
+    """добавление нового отзыва"""
     #    model = Feedbacks                          # это для описания через модель
     #    fields = ['buyer', 'product', 'comment']   # это для описания через модель
 
@@ -103,12 +237,12 @@ class AddFeedback(CreateView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Оставьте отзыв о товаре'
-        #        context['user1'] = self.request.user
+        context['buyer'] = self.request.user
         return context
 
         # if context['user'].is_authenticated:
         #     AddFeedbackForm.buyer = context['user'].username
-        return context
+        # return context
 
         # {% if request.user.is_authenticated %}
         #     {% form['buyer'] = request.user.username %}
