@@ -20,7 +20,8 @@ class Pizza(models.Model):
     # со страничкой данного товара.
     # в скобочках функции reverse_lazy мы строим маршрут из urls.py
     def get_absolute_url(self):
-       return reverse_lazy('show_product', kwargs={"product_id": self.pk})
+       # return reverse_lazy('show_product', kwargs={"product_id": self.pk})  #вывод товара без использования REST
+       return reverse_lazy('product_detail2', kwargs={"pk": self.pk})    #вывод товара через GenericAPIView
 
     def __str__(self):
         return self.name

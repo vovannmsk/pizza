@@ -1,6 +1,8 @@
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render, redirect
+from rest_framework.renderers import TemplateHTMLRenderer
+
 # from django.urls import reverse_lazy
 # from django.views.decorators.http import require_POST
 # from .models import Pizza, TypeOfProduct, Feedbacks, Buyers
@@ -15,7 +17,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import generics, permissions, viewsets
+#from django_filters.rest_framework import DjangoFilterBackend
 
 # =====================================================================================================================
 # вывод данных с помощью метода def
@@ -23,7 +26,66 @@ from rest_framework.permissions import IsAuthenticated
 def list_app(request):
     return render(request, 'pizza_shop/list_app.html')
 
+# =====================================================================================================================
+# вывод данных с помощью ViewSet и router
+# =====================================================================================================================
+class ListAllProducts(ModelViewSet):
+    queryset = Pizza.objects.filter(is_ready=True)
+    serializer_class = PizzaSerializer
 
+# =====================================================================================================================
+# вывод данных с помощью классов ViewSet
+# =====================================================================================================================
+class PizzaListVS(viewsets.ReadOnlyModelViewSet):
+    """Вывод всех продуктов через ViewSet"""
+
+    queryset = Pizza.objects.filter(is_ready=True)
+    serializer_class = PizzaSerializer
+
+
+class ProductDetailViewVS(viewsets.ReadOnlyModelViewSet):
+    """Вывод сведений по одному товару (вместе с отзывами по нему)"""
+
+    queryset = Pizza.objects.all()
+    serializer_class = ProductDetailSerializer
+
+
+class ProductsFromCategoryVS(viewsets.ReadOnlyModelViewSet):
+    """Вывод всех продуктов одной категории через ViewSet"""
+    serializer_class = PizzaSerializer
+
+    def get_queryset(self):
+        """'этот метод вместо строки queryset = ... """
+        return Pizza.objects.filter(is_ready=True, type_product=self.kwargs["type_product"]).order_by('id')
+
+
+
+class ListOfCategoriesVS(viewsets.ReadOnlyModelViewSet):
+    """Вывод всех категорий продуктов через ViewSet"""
+
+    queryset = TypeOfProduct.objects.all().order_by('id')
+    serializer_class = CategoriesSerializer
+
+
+class FeedbackCreateVS(viewsets.ModelViewSet):
+    """Добавление отзыва на товар с помощью класса ModelViwSet"""
+    serializer_class = FeedbackCreateSerializer
+    permission_classes = [permissions.AllowAny]
+    def perform_create(self, serializer):
+        """Переопределил метод, чтобы полю user присвоить значение актуального юзера"""
+        if self.request.user.is_authenticated:
+            serializer.save(user=self.request.user)
+        else:
+            serializer.save()
+
+
+class FeedbackViewVS(viewsets.ReadOnlyModelViewSet):
+    """Вывод отзывов на один товар"""
+    serializer_class = FeedbackViewSerializer
+
+    def get_queryset(self):
+        """'этот метод вместо строки queryset = ... """
+        return Feedbacks.objects.filter(product=self.kwargs["product"]).order_by('id')
 # =====================================================================================================================
 # вывод данных с помощью классов APIView
 # =====================================================================================================================
@@ -64,7 +126,7 @@ class ListOfCategories(APIView):
 
 
 class FeedbackCreate(APIView):
-    """создание отзыва из формы"""
+    """Создание отзыва из формы"""
 
     def post(self, request):
         feedback = FeedbackCreateSerializer(data=request.data)
@@ -80,7 +142,7 @@ class FeedbackCreate(APIView):
 
 
 class FeedbackView(APIView):
-    """вывод отзывов на один товар"""
+    """Вывод отзывов на один товар"""
 
     def get(self, request, pk):
         feedback = Feedbacks.objects.filter(product=pk).order_by('id')
@@ -95,7 +157,12 @@ class PizzaList2(ListAPIView):
     """Вывод всех продуктов через serializer"""
     queryset = Pizza.objects.filter(is_ready=True)
     serializer_class = PizzaSerializer
+    # permission_classes = [permissions.IsAuthenticated]
 
+    renderer_classes = (TemplateHTMLRenderer, )
+    template_name = 'pizza_shop/list2.html'
+
+    # context_object_name = 'page_obj'  # как данные будут называться в html
 
 class ProductDetailView2(RetrieveAPIView):
     """Вывод сведений по одному товару (вместе с отзывами по нему)"""
@@ -119,9 +186,9 @@ class ListOfCategories2(ListAPIView):
 
 
 class FeedbackCreate2(CreateAPIView):
-    """создание отзыва для выбранного товара"""
+    """Создание отзыва для выбранного товара"""
     serializer_class = FeedbackCreateSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     # def post(self, request):
     #     feedback = FeedbackCreateSerializer(data=request.data)
@@ -130,25 +197,18 @@ class FeedbackCreate2(CreateAPIView):
     #     return Response({'post': feedback.data})
 
     def perform_create(self, serializer):
-        """переопределил метод, чтобы полю user присвоить значение актуального юзера"""
+        """Переопределил метод, чтобы полю user присвоить значение актуального юзера"""
         serializer.save(user=self.request.user)
 
 
 class FeedbackView2(ListAPIView):
-    """вывод отзывов на один товар"""
+    """Вывод отзывов на один товар"""
     serializer_class = FeedbackViewSerializer
 
     def get_queryset(self):
         """'этот метод вместо строки queryset = ... """
         return Feedbacks.objects.filter(product=self.kwargs["product"]).order_by('id')
 
-
-# =====================================================================================================================
-# вывод данных с помощью ViewSet
-# =====================================================================================================================
-class ListAllProducts(ModelViewSet):
-    queryset = Pizza.objects.filter(is_ready=True)
-    serializer_class = PizzaSerializer
 
 # =====================================================================================================================
 # ====================================== ОБЫЧНЫЕ VIEWS БЕЗ ИСПОЛЬЗОВАНИЯ REST_FRAMEWORKS ==============================
@@ -164,8 +224,8 @@ def pizza_main(request):
 
 
 # получение полного списка продуктов, доступных для заказа (с помощью класса)
-class List_Of_Product(ListView):
-    """получение полного списка продуктов, доступных для заказа (с помощью класса)"""
+class ListOfProduct(ListView):
+    """Получение полного списка продуктов, доступных для заказа (с помощью класса)"""
     paginate_by = 3
     model = Pizza
     template_name = 'pizza_shop/list.html'
@@ -182,9 +242,8 @@ class List_Of_Product(ListView):
         return Pizza.objects.filter(is_ready=True).select_related('type_product')
 
 
-# получение списка продуктов одной категории, доступных для заказа (с помощью класса)
-class List_Product_Category(ListView):
-    """получение списка продуктов одной категории, доступных для заказа (с помощью класса)"""
+class ListProductsCategory(ListView):
+    """Получение списка продуктов одной категории, доступных для заказа (с помощью класса)"""
     paginate_by = 3
     model = Pizza
     template_name = 'pizza_shop/list.html'
@@ -209,7 +268,7 @@ class List_Product_Category(ListView):
 
 
 class ShowProduct(DetailView):
-    """просмотр одного товара вместе с отзывами по нему (с помощью класса)"""
+    """Просмотр одного товара вместе с отзывами по нему (с помощью класса)"""
     model = Pizza
     template_name = 'pizza_shop/show_product.html'
     pk_url_kwarg = 'product_id'  # название параметра, который передаёт в класс id (или pk)
@@ -226,7 +285,7 @@ class ShowProduct(DetailView):
 
 
 class AddFeedback(CreateView):
-    """добавление нового отзыва"""
+    """Добавление нового отзыва"""
     #    model = Feedbacks                          # это для описания через модель
     #    fields = ['buyer', 'product', 'comment']   # это для описания через модель
 

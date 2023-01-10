@@ -8,8 +8,8 @@ router.register('api/list', ListAllProducts)
 
 urlpatterns = [
     path('', pizza_main, name='home'),
-    path('list/', List_Of_Product.as_view(), name='list'),
-    path('list/<int:type_id>/', List_Product_Category.as_view(), name='type'),
+    path('list/', ListOfProduct.as_view(), name='list'),
+    path('list/<int:type_id>/', ListProductsCategory.as_view(), name='type'),
     path('product/<int:product_id>/', ShowProduct.as_view(), name='show_product'),
     path('add_feedback/', AddFeedback.as_view(), name='add_feedback'),
     path('feedback/<int:feedback_id>/', ShowFeedback.as_view(), name='show_feedback'),
@@ -35,6 +35,15 @@ urlpatterns = [
     path('api/v1/generic/cat/<int:type_product>/', ProductsFromCategory2.as_view(), name='products_from_category2'),
     path('api/v1/generic/feedback/', FeedbackCreate2.as_view(), name='create_feedback2'),
     path('api/v1/generic/feedback/<int:product>/', FeedbackView2.as_view(), name='list_feedbacks2'),
+
+    # через классы ViewSet
+    path('api/v1/view-set/list/', PizzaListVS.as_view({'get': 'list'}), name='list_productsVS'),
+    path('api/v1/view-set/list/<int:pk>/', ProductDetailViewVS.as_view({'get': 'retrieve'}), name='product_detailVS'),
+    path('api/v1/view-set/cat/', ListOfCategoriesVS.as_view({'get': 'list'}), name='categoriesVS'),
+    path('api/v1/view-set/cat/<int:type_product>/', ProductsFromCategoryVS.as_view({'get': 'list'}),
+         name='products_from_categoryVS'),
+    path('api/v1/view-set/feedback/', FeedbackCreateVS.as_view({'post': 'create'}), name='create_feedbackVS'),
+    path('api/v1/view-set/feedback/<int:product>/', FeedbackViewVS.as_view({'get': 'list'}), name='list_feedbacksVS'),
 
 ]
 
