@@ -155,12 +155,13 @@ class FeedbackView(APIView):
 # =====================================================================================================================
 class PizzaList2(ListAPIView):
     """Вывод всех продуктов через serializer"""
-    queryset = Pizza.objects.filter(is_ready=True)
+    queryset = Pizza.objects.filter(is_ready=True).order_by('id')
     serializer_class = PizzaSerializer
     # permission_classes = [permissions.IsAuthenticated]
+    # pagination_class = LargeResultsSetPagination     # так можно указать класс для разбивки на страницы
 
-    renderer_classes = (TemplateHTMLRenderer, )
-    template_name = 'pizza_shop/list2.html'
+    # renderer_classes = (TemplateHTMLRenderer, )
+    # template_name = 'pizza_shop/list2.html'
 
     # context_object_name = 'page_obj'  # как данные будут называться в html
 
@@ -229,7 +230,7 @@ class ListOfProduct(ListView):
     paginate_by = 3
     model = Pizza
     template_name = 'pizza_shop/list.html'
-    context_object_name = 'page_obj'  # как данные будут называться в html
+    #context_object_name = 'page_obj'  # как данные будут называться в html
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -239,7 +240,7 @@ class ListOfProduct(ListView):
         return context
 
     def get_queryset(self):
-        return Pizza.objects.filter(is_ready=True).select_related('type_product')
+        return Pizza.objects.filter(is_ready=True).select_related('type_product').order_by('id')
 
 
 class ListProductsCategory(ListView):
@@ -253,8 +254,8 @@ class ListProductsCategory(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)  # получаем уже сформированный контекст
         context['cart_product_form'] = CartAddProductForm()  # передаём корзину в html
-        context['title'] = TypeOfProduct.objects.get(
-            pk=self.kwargs['type_id'])  # в title присваиваем название категории товара
+        context['title'] = TypeOfProduct.objects.get(pk=self.kwargs['type_id'])
+        # в title присваиваем название категории товара
         context['category'] = self.kwargs['type_id']
         return context
 
