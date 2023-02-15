@@ -49,4 +49,4 @@ class CategoriesSerializer(ModelSerializer):
 
     class Meta:
         model = TypeOfProduct
-        fields = ['id', 'nameOfType', 'slug']
+        fields = ['id', 'pk', 'nameOfType', 'slug']

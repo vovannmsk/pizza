@@ -5,8 +5,9 @@ new Vue({
     },
     created: function () {
         const vm = this;
-        axios.get('/api/list/').then(function (response){
-        vm.products = response.data
+        axios.get('/api/list2/').then(function(response){
+            console.log(response.data);
         })
+
     }
 })

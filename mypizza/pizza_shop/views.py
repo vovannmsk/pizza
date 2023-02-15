@@ -17,8 +17,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import generics, permissions, viewsets
-#from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, permissions, viewsets, renderers
+from rest_framework.permissions import IsAuthenticated
+
+# from django_filters.rest_framework import DjangoFilterBackend
+
 
 # =====================================================================================================================
 # вывод данных с помощью метода def
@@ -26,12 +29,14 @@ from rest_framework import generics, permissions, viewsets
 def list_app(request):
     return render(request, 'pizza_shop/list_app.html')
 
+
 # =====================================================================================================================
 # вывод данных с помощью ViewSet и router
 # =====================================================================================================================
 class ListAllProducts(ModelViewSet):
     queryset = Pizza.objects.filter(is_ready=True)
     serializer_class = PizzaSerializer
+
 
 # =====================================================================================================================
 # вывод данных с помощью классов ViewSet
@@ -59,7 +64,6 @@ class ProductsFromCategoryVS(viewsets.ReadOnlyModelViewSet):
         return Pizza.objects.filter(is_ready=True, type_product=self.kwargs["type_product"]).order_by('id')
 
 
-
 class ListOfCategoriesVS(viewsets.ReadOnlyModelViewSet):
     """Вывод всех категорий продуктов через ViewSet"""
 
@@ -71,6 +75,7 @@ class FeedbackCreateVS(viewsets.ModelViewSet):
     """Добавление отзыва на товар с помощью класса ModelViwSet"""
     serializer_class = FeedbackCreateSerializer
     permission_classes = [permissions.AllowAny]
+
     def perform_create(self, serializer):
         """Переопределил метод, чтобы полю user присвоить значение актуального юзера"""
         if self.request.user.is_authenticated:
@@ -86,6 +91,8 @@ class FeedbackViewVS(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         """'этот метод вместо строки queryset = ... """
         return Feedbacks.objects.filter(product=self.kwargs["product"]).order_by('id')
+
+
 # =====================================================================================================================
 # вывод данных с помощью классов APIView
 # =====================================================================================================================
@@ -157,13 +164,24 @@ class PizzaList2(ListAPIView):
     """Вывод всех продуктов через serializer"""
     queryset = Pizza.objects.filter(is_ready=True).order_by('id')
     serializer_class = PizzaSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     # pagination_class = LargeResultsSetPagination     # так можно указать класс для разбивки на страницы
-
-    # renderer_classes = (TemplateHTMLRenderer, )
+                                                       # ИНДИВИДУАЛЬНО для данного класса
+    # renderer_classes = [renderers.JSONRenderer, renderers.BrowsableAPIRenderer]
     # template_name = 'pizza_shop/list2.html'
+    # template_name = 'pizza_shop/list_app.html'
 
-    # context_object_name = 'page_obj'  # как данные будут называться в html
+    # def get_serializer_context(self):
+    #     context = super().get_serializer_context()
+    #     context["cart_product_form"] = CartAddProductForm()  # передаём корзину в html
+    #     context["title"] = 'Список пицц для заказа'
+    #     return context
+    # def get_context_data(self, *, object_list=None, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     context['cart_product_form'] = CartAddProductForm()  # передаём корзину в html
+    #     context['title'] = 'Список пицц для заказа'
+    #     context['category'] = 0
+    #     return context
 
 class ProductDetailView2(RetrieveAPIView):
     """Вывод сведений по одному товару (вместе с отзывами по нему)"""
@@ -230,7 +248,8 @@ class ListOfProduct(ListView):
     paginate_by = 3
     model = Pizza
     template_name = 'pizza_shop/list.html'
-    #context_object_name = 'page_obj'  # как данные будут называться в html
+
+    # context_object_name = 'page_obj'  # как данные будут называться в html
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Pizza, TypeOfProduct, Buyers, Feedbacks
+from .models import Pizza, TypeOfProduct, Feedbacks
 
 
 class PizzaAdmin(admin.ModelAdmin):
@@ -20,9 +20,9 @@ class TypeAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('nameOfType',)}
 
 
-class BuyersAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'phoneNumber', 'address')
-    list_display_links = ('id', 'name')
+# class BuyersAdmin(admin.ModelAdmin):
+#     list_display = ('id', 'name', 'phoneNumber', 'address')
+#     list_display_links = ('id', 'name')
 
 
 class FeedbacksAdmin(admin.ModelAdmin):
@@ -33,5 +33,5 @@ class FeedbacksAdmin(admin.ModelAdmin):
 
 admin.site.register(Pizza, PizzaAdmin)
 admin.site.register(TypeOfProduct, TypeAdmin)
-admin.site.register(Buyers, BuyersAdmin)
+# admin.site.register(Buyers, BuyersAdmin)
 admin.site.register(Feedbacks, FeedbacksAdmin)

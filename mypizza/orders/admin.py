@@ -7,7 +7,6 @@ from django.urls import reverse
 from django.utils.html import format_html
 
 
-# Register your models here.
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     raw_id_fields = ['product']

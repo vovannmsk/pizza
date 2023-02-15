@@ -10,10 +10,11 @@
 {% endblock %}
 
 {% block listOfProduct %}
+
 {% verbatim %}
 <div class="container" id="list_apps">
-    <div class="row" v-for="item in products">
-        <div class="col-lg-4 col-sm-6 mb-2">
+    <div class="row">
+        <div class="col-lg-4 col-sm-6 mb-2" v-for="item in products" :key="item.id">
             <div class="card">
                 <div class="card-img-top product-thumb">
                     <a :href="item.adress"><img :src="item.photo" :alt="item.name"> </a>
@@ -24,52 +25,12 @@
                     <h5 class="card-text card-price">Цена: {{ item.currentPrice }} руб.</h5>
                 </div>
                 <div class="card-footer text-muted product-bottom">
-                    <form action="{% url 'cart_add' item.pk %}" method="post">
-                        <div class="d-flex justify-content-between">
-                            <div class="quantity card-text">
-                                <p>{{ cart_product_form }}</p>
-                            </div>
-                            <div class="cart-button">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-primary" value="В корзину">
-                            </div>
-                        </div>
-                    </form>
+
                 </div>
             </div>
         </div>
     </div>
 </div>
 {% endverbatim %}
--<!- pagination -->
-{% if page_obj.has_other_pages %}   <!-- вывод списка страниц, только если их больше одной -->
-<br> <br>
-<nav aria-label="...">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous %}
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-        </a>
-        {% endif %}
-        {% for p in paginator.page_range %}
-        {% if page_obj.number == p %}
-        <li class="page-item active" aria-current="page">
-            <a class="page-link" href="#">{{ p }}</a>
-        </li>
-        {% elif p >= page_obj.number|add:-1 and p <= page_obj.number|add:1 %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ p }}">{{ p }}</a>
-        </li>
-        {% endif %}
-        {% endfor %}
-        {% if page_obj.has_next %}
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-        </a>
-        {% endif %}
-    </ul>
-</nav>
-{% endif%}
-<!-- end pagination -->
 
 {% endblock %}

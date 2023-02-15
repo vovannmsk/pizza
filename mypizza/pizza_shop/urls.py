@@ -1,12 +1,17 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
+from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 
 from .views import *
 
-router = SimpleRouter()
-router.register('api/list', ListAllProducts)
+
 
 urlpatterns = [
+    # аутентификация jwt
+    path('api-token/', TokenObtainPairView.as_view(), name='get_token'),
+    path('api-token-refresh/', TokenRefreshView.as_view(), name='refresh_token'),
+
+    # работа через классы (именно это работает при запуске проги)
     path('', pizza_main, name='home'),
     path('list/', ListOfProduct.as_view(), name='list'),
     path('list/<int:type_id>/', ListProductsCategory.as_view(), name='type'),
@@ -19,6 +24,7 @@ urlpatterns = [
 
     # view через def
     path('list_app/', list_app, name='list_app'),
+    path('api/list2/', PizzaList2.as_view(), name='list_app2'),
 
     # через классы APIView
     path('api/v1/list/', PizzaList.as_view(), name='list_products'),
@@ -27,6 +33,8 @@ urlpatterns = [
     path('api/v1/cat/<int:pk>/', ProductsFromCategory.as_view(), name='products_from_category'),
     path('api/v1/feedback/', FeedbackCreate.as_view(), name='create_feedback'),
     path('api/v1/feedback/<int:pk>/', FeedbackView.as_view(), name='list_feedbacks'),
+    # path('api/v1/logout/', logout_user, name='logout'),
+    # path('login/', LoginUser.as_view(), name='login'),
 
     # через классы GenericAPIView
     path('api/v1/generic/list/', PizzaList2.as_view(), name='list_products2'),
@@ -47,4 +55,7 @@ urlpatterns = [
 
 ]
 
+
+router = SimpleRouter()
+router.register('api/list', ListAllProducts)
 urlpatterns += router.urls
