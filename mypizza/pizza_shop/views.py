@@ -1,5 +1,6 @@
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
+from django.core.mail.backends import console
 from django.shortcuts import render, redirect
 from rest_framework.renderers import TemplateHTMLRenderer
 
@@ -12,10 +13,10 @@ from django.views.generic import ListView, DetailView, CreateView
 from .forms import *
 
 from .serializers import PizzaSerializer, ProductDetailSerializer, FeedbackCreateSerializer, CategoriesSerializer, \
-    FeedbackViewSerializer
+    FeedbackViewSerializer, FeedbacksUserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import generics, permissions, viewsets, renderers
 from rest_framework.permissions import IsAuthenticated
@@ -209,6 +210,7 @@ class FeedbackCreate2(CreateAPIView):
     serializer_class = FeedbackCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+
     # def post(self, request):
     #     feedback = FeedbackCreateSerializer(data=request.data)
     #     feedback.is_valid(raise_exception=True)
@@ -227,6 +229,16 @@ class FeedbackView2(ListAPIView):
     def get_queryset(self):
         """'этот метод вместо строки queryset = ... """
         return Feedbacks.objects.filter(product=self.kwargs["product"]).order_by('id')
+
+class FeedbacksView(ListAPIView):
+    """Вывод отзывов текущего пользователя"""
+    serializer_class = FeedbacksUserSerializer
+
+    def get_queryset(self):
+        """'этот метод вместо строки queryset = ... """
+        return Feedbacks.objects.filter(user=self.request.user.id).select_related('product')
+
+
 
 
 # =====================================================================================================================

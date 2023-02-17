@@ -33,16 +33,19 @@ urlpatterns = [
     path('api/v1/cat/<int:pk>/', ProductsFromCategory.as_view(), name='products_from_category'),
     path('api/v1/feedback/', FeedbackCreate.as_view(), name='create_feedback'),
     path('api/v1/feedback/<int:pk>/', FeedbackView.as_view(), name='list_feedbacks'),
+
     # path('api/v1/logout/', logout_user, name='logout'),
     # path('login/', LoginUser.as_view(), name='login'),
 
-    # через классы GenericAPIView
+    # через классы GenericAPIView--------------------------------------------------------------------------------------
     path('api/v1/generic/list/', PizzaList2.as_view(), name='list_products2'),
     path('api/v1/generic/list/<int:pk>/', ProductDetailView2.as_view(), name='product_detail2'),
     path('api/v1/generic/cat/', ListOfCategories2.as_view(), name='categories2'),
     path('api/v1/generic/cat/<int:type_product>/', ProductsFromCategory2.as_view(), name='products_from_category2'),
     path('api/v1/generic/feedback/', FeedbackCreate2.as_view(), name='create_feedback2'),
     path('api/v1/generic/feedback/<int:product>/', FeedbackView2.as_view(), name='list_feedbacks2'),
+    path('api/v1/generic/feedbacks/', FeedbacksView.as_view(), name='list_user_feedbacks'),
+    # =================================================================================================================
 
     # через классы ViewSet
     path('api/v1/view-set/list/', PizzaListVS.as_view({'get': 'list'}), name='list_productsVS'),

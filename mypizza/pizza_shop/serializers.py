@@ -34,6 +34,19 @@ class FeedbackViewSerializer(ModelSerializer):
         fields = ("buyer", "comment", "user")
 
 
+#=========================================================================================
+class FeedbacksUserSerializer(ModelSerializer):
+    """Вывод отзывов одного пользователя"""
+    # product = serializers.SlugRelatedField(slug_field='name', read_only=True)
+    # вместо id продукта подставляем name (в модели Pizza)
+    product = PizzaSerializer()
+
+    class Meta:
+        model = Feedbacks
+        # fields = ("id", "pk", "buyer", "comment", "user", "product")
+        fields = '__all__'
+# ==========================================================================================
+
 class ProductDetailSerializer(ModelSerializer):
     """Вывод сведений по одному товару (вместе с отзывами по нему)"""
     type_product = serializers.SlugRelatedField(slug_field='nameOfType', read_only=True)
