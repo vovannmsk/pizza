@@ -19,6 +19,9 @@ class Order(models.Model):
     # username соответствует имени, под которым пользователь залогинился
     # необходимо для вывода списка заказов конкретного пользователя
     delivered = models.BooleanField(default=False, verbose_name='Доставлен')
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Общая сумма заказа', null=True,
+                                     default=0)
+    phone = models.CharField(max_length=20, verbose_name='Телефон заказчика', null=True, default="")
 
     class Meta:
         ordering = ('-created',)

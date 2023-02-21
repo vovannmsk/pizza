@@ -1,7 +1,11 @@
 from django.views.generic import ListView
+from rest_framework.generics import CreateAPIView, ListAPIView
+import datetime
 
 from cart.cart import Cart
 from django.shortcuts import render
+
+from .serializers import OrderSerializer, OrderItemSerializer, OrderItemCreateSerializer
 from .tasks import order_created
 
 from .forms import OrderCreateForm
@@ -13,6 +17,8 @@ from .models import Order
 # from django.conf import settings
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+
+from rest_framework import generics, permissions, viewsets, renderers
 # import weasyprint
 
 
@@ -98,3 +104,53 @@ class my_orders(ListView):
 #        return Pizza.objects.filter(type_product__slug=self.kwargs['type_slug'], is_ready=True)
 #       такой запрос был бы, если использовать отбор по слагу.
 #       В urls.py должен быть <int:type_slug> вместо <int:type_id>
+
+class OrderCreate(CreateAPIView):
+    """Создание шапки заказа """
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    def perform_create(self, serializer):
+        """Переопределил метод, чтобы полю user присвоить значение актуального юзера"""
+        serializer.save(
+            username=self.request.user,
+            paid=True,
+            created=datetime.datetime.now())
+        # добавить сюда и дату создания заказа
+
+
+class OrderItemCreate(CreateAPIView):
+    """перенос товаров в корзине в заказ"""
+    serializer_class = OrderItemCreateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+
+    # def perform_create(self, serializer):
+    #     """Переопределил метод, чтобы полю user присвоить значение актуального юзера"""
+    #     serializer.save()
+
+# class OrderCreatePlusItem(ListCreateAPIView):
+#     """Создание заказа по корзине"""
+#     serializer_class = OrderPlusItemSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+#     queryset = Order.objects.all()
+    # queryset = OrderItem.objects.all()
+
+class MyOrdersList(ListAPIView):
+    """Вывод всех категорий продуктов через serializer"""
+    queryset = Order.objects.all().order_by('id')
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        """'этот метод вместо строки queryset = ... """
+        return Order.objects.filter(username=self.request.user)
+
+class OrderItems(ListAPIView):
+    """Вывод всех продуктов заказа через serializer"""
+    # queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
+
+    def get_queryset(self):
+        """'этот метод вместо строки queryset = ... """
+        return OrderItem.objects.filter(order=self.kwargs["order_id"])

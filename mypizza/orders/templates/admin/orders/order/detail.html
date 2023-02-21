@@ -35,8 +35,13 @@
             <td>{{ order.address }}, {{ order.postal_code }} {{ order.city }}</td>
         </tr>
         <tr>
+            <th>Телефон</th>
+            <td>{{ order.phone }}</td>
+        </tr>
+        <tr>
             <th>Общая сумма</th>
-            <td>{{ order.get_total_cost }} руб.</td>
+<!--            <td>{{ order.get_total_cost }} руб.</td>-->
+            <td>{{ order.total_amount }} руб.</td>
         </tr>
         <tr>
             <th>Статус</th>

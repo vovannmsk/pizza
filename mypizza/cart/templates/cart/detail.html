@@ -3,107 +3,112 @@
  
 {% block title %}Корзина{% endblock %}
  
-{% block listOfProduct %}
-    <div class="text-bg-primary p-4">
-        <h2>Ваша корзина</h2>
+{% block content %}
+    <div class="container text-dark">
+        <div class="row justify-content-md-center">
+            <div class="col-md-9 p-3 justify-content-md-center">
+
+                <div class="text-bg-primary p-4">
+                    <h2>Ваша корзина</h2>
+                </div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Фото</th>
+                      <th scope="col">Наименование продукта</th>
+                      <th scope="col">Количество</th>
+                      <th scope="col">Удалить</th>
+                      <th scope="col">Цена продукта</th>
+                      <th scope="col">Итоговая цена</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in cart %}
+                        {% with product=item.product %}
+                        <tr>
+                            <td scope="row">
+                                <a href="{{ product.get_absolute_url }}">
+                                    <img src="{% if product.photo.url %}{{ product.photo.url }}{% else %}{% static 'photo/no_image.png' %}{% endif %}" width="100" height="100">
+                                </a>
+                            </td>
+                            <td>  {{ product.name }}   </td>
+                            <td>
+                                <form action="{% url 'cart_add' product.id %}" method="post">
+                                    {{ item.update_quantity_form.quantity }}
+                                    {{ item.update_quantity_form.update }}
+                                    <input type="submit" value="Обновить">
+                                    {% csrf_token %}
+                                </form>
+                            </td>
+                            <td>  <a href="{% url 'cart_remove' product.id %}"> Удалить </a>  </td>
+                            <td class="num">  {{ item.price }}руб.  </td>
+                            <td class="num">  {{ item.total_price }}руб.  </td>
+                        </tr>
+                        {% endwith %}
+                    {% endfor %}
+                    <tr class="total">
+                        <td>Total</td>
+                        <td colspan="4"></td>
+                        <td class="num">  {{ cart.get_total_price }}руб.  </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <p class="text-right">
+                    <a class="btn btn-primary" href="{% url 'list' %}" role="button">Продолжить покупки</a>
+                    <a class="btn btn-primary" href="{% url 'order_create' %}" role="button">Оплатить заказ</a>
+
+                    <!-- <a class="btn btn-primary" href="#" role="button">Оплатить заказ</a> -->
+                    <!--<a href="{% url 'list' %}" class="button light">Продолжить покупки</a>
+                    <a href="#" class="button">Checkout</a>  -->
+                </p>
+
+               <!-- <table class="cart">
+                    <thead>
+                    <tr>
+                        <th>  Фото  </th>
+                        <th> Наименование продукта </th>
+                        <th> Количество </th>
+                        <th> Удалить </th>
+                        <th> Цена продукта за 1 ед. </th>
+                        <th> Общая цена продукта </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item in cart %}
+                        {% with product=item.product %}
+                            <tr>
+                                <td>
+                                    <a href="{{ product.get_absolute_url }}">
+                                        <img src="{% if product.photo.url %}{{ product.photo.url }}{% else %}{% static 'media/photo/no_image.png' %}{% endif %}" width="100" height="100">
+
+                                    </a>
+                                </td>
+                                <td>  {{ product.name }}   </td>
+                                <td>  {{ item.quantity }}  </td>
+                                <td>
+                                    <a href="{% url 'cart_remove' product.id %}"> Remove </a>
+                                </td>
+                                <td class="num">  {{ item.price }}руб.  </td>
+                                <td class="num">  {{ item.total_price }}руб.  </td>
+                            </tr>
+                        {% endwith %}
+                    {% endfor %}
+                    <tr class="total">
+                        <td>Total</td>
+                        <td colspan="4"></td>
+                        <td class="num">  {{ cart.get_total_price }}руб.  </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <p class="text-right">
+                    <a href="{% url 'list' %}" class="button light">Продолжить покупки</a>
+                    <a href="#" class="button">Checkout</a>
+                </p>
+
+                -->
+
+            </div>
+        </div>
     </div>
-    <table class="table">
-      <thead>
-        <tr>
-          <th scope="col">Фото</th>
-          <th scope="col">Наименование продукта</th>
-          <th scope="col">Количество</th>
-          <th scope="col">Удалить</th>
-          <th scope="col">Цена продукта</th>
-          <th scope="col">Итоговая цена</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in cart %}
-            {% with product=item.product %}
-            <tr>
-                <td scope="row">
-                    <a href="{{ product.get_absolute_url }}">
-                        <img src="{% if product.photo.url %}{{ product.photo.url }}{% else %}{% static 'photo/no_image.png' %}{% endif %}" width="100" height="100">
-                    </a>
-                </td>
-                <td>  {{ product.name }}   </td>
-                <td>
-                    <form action="{% url 'cart_add' product.id %}" method="post">
-                        {{ item.update_quantity_form.quantity }}
-                        {{ item.update_quantity_form.update }}
-                        <input type="submit" value="Обновить">
-                        {% csrf_token %}
-                    </form>
-                </td>
-                <td>  <a href="{% url 'cart_remove' product.id %}"> Удалить </a>  </td>
-                <td class="num">  {{ item.price }}руб.  </td>
-                <td class="num">  {{ item.total_price }}руб.  </td>
-            </tr>
-            {% endwith %}
-        {% endfor %}
-        <tr class="total">
-            <td>Total</td>
-            <td colspan="4"></td>
-            <td class="num">  {{ cart.get_total_price }}руб.  </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p class="text-right">
-        <a class="btn btn-primary" href="{% url 'list' %}" role="button">Продолжить покупки</a>
-        <a class="btn btn-primary" href="{% url 'order_create' %}" role="button">Оплатить заказ</a>
-
-        <!-- <a class="btn btn-primary" href="#" role="button">Оплатить заказ</a> -->
-        <!--<a href="{% url 'list' %}" class="button light">Продолжить покупки</a>
-        <a href="#" class="button">Checkout</a>  -->
-    </p>
-
-
-   <!-- <table class="cart">
-        <thead>
-        <tr>
-            <th>  Фото  </th>
-            <th> Наименование продукта </th>
-            <th> Количество </th>
-            <th> Удалить </th>
-            <th> Цена продукта за 1 ед. </th>
-            <th> Общая цена продукта </th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for item in cart %}
-            {% with product=item.product %}
-                <tr>
-                    <td>
-                        <a href="{{ product.get_absolute_url }}">
-                            <img src="{% if product.photo.url %}{{ product.photo.url }}{% else %}{% static 'media/photo/no_image.png' %}{% endif %}" width="100" height="100">
-
-                        </a>
-                    </td>
-                    <td>  {{ product.name }}   </td>
-                    <td>  {{ item.quantity }}  </td>
-                    <td>
-                        <a href="{% url 'cart_remove' product.id %}"> Remove </a>
-                    </td>
-                    <td class="num">  {{ item.price }}руб.  </td>
-                    <td class="num">  {{ item.total_price }}руб.  </td>
-                </tr>
-            {% endwith %}
-        {% endfor %}
-        <tr class="total">
-            <td>Total</td>
-            <td colspan="4"></td>
-            <td class="num">  {{ cart.get_total_price }}руб.  </td>
-        </tr>
-        </tbody>
-    </table>
-    <p class="text-right">
-        <a href="{% url 'list' %}" class="button light">Продолжить покупки</a>
-        <a href="#" class="button">Checkout</a>
-    </p>
-
-    -->
-
-
 {% endblock %}  
