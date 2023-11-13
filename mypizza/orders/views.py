@@ -10,9 +10,10 @@ from .tasks import order_created
 
 from .forms import OrderCreateForm
 from .models import OrderItem
+from .models import Order
 from django.contrib.admin.views.decorators import staff_member_required
 from django.shortcuts import get_object_or_404
-from .models import Order
+
 
 # from django.conf import settings
 from django.http import HttpResponse
@@ -105,14 +106,17 @@ class my_orders(ListView):
 #       такой запрос был бы, если использовать отбор по слагу.
 #       В urls.py должен быть <int:type_slug> вместо <int:type_id>
 
+# ============================================================================
+# Далее идут методы DRF
+# ============================================================================
+
 class OrderCreate(CreateAPIView):
     """Создание шапки заказа """
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
     def perform_create(self, serializer):
-        """Переопределил метод, чтобы полю user присвоить значение актуального юзера"""
+        """ Переопределил метод, чтобы полю user присвоить значение актуального юзера """
         serializer.save(
             username=self.request.user,
             paid=True,
@@ -121,7 +125,7 @@ class OrderCreate(CreateAPIView):
 
 
 class OrderItemCreate(CreateAPIView):
-    """перенос товаров в корзине в заказ"""
+    """ Создание табличной части заказа. Перенос товаров из корзины в заказ """
     serializer_class = OrderItemCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -138,7 +142,7 @@ class OrderItemCreate(CreateAPIView):
     # queryset = OrderItem.objects.all()
 
 class MyOrdersList(ListAPIView):
-    """Вывод всех категорий продуктов через serializer"""
+    """Вывод всех заказов по выбранному покупателю через serializer"""
     queryset = Order.objects.all().order_by('id')
     serializer_class = OrderSerializer
 
@@ -147,7 +151,7 @@ class MyOrdersList(ListAPIView):
         return Order.objects.filter(username=self.request.user)
 
 class OrderItems(ListAPIView):
-    """Вывод всех продуктов заказа через serializer"""
+    """Вывод всех продуктов выбранного заказа через serializer"""
     # queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
 

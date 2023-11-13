@@ -7,6 +7,8 @@ urlpatterns = [
     path('myorders/', views.my_orders.as_view(), name='my_orders'),
     path('admin/order/<int:order_id>/', views.admin_order_detail, name='admin_order_detail'),
     path('admin/order/<int:order_id>/pdf/', views.admin_order_pdf, name='admin_order_pdf'),
+
+    # далее идут контрольные точки, сформированные с помощью методов на DRF
     path('api/v1/generic/create_order/', OrderCreate.as_view(), name='create_order'),
     path('api/v1/generic/create_order_item/', OrderItemCreate.as_view(), name='create_order_items'),
     # path('api/v1/generic/create_order_plus_item/', OrderCreatePlusItem.as_view(), name='create_order'),

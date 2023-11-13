@@ -37,7 +37,7 @@ urlpatterns = [
     # path('api/v1/logout/', logout_user, name='logout'),
     # path('login/', LoginUser.as_view(), name='login'),
 
-    # через классы GenericAPIView--------------------------------------------------------------------------------------
+    # через классы GenericAPIView (DRF)-------------------------------------------------------------------------------
     path('api/v1/generic/list/', PizzaList2.as_view(), name='list_products2'),
     path('api/v1/generic/list/<int:pk>/', ProductDetailView2.as_view(), name='product_detail2'),
     path('api/v1/generic/cat/', ListOfCategories2.as_view(), name='categories2'),
