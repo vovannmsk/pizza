@@ -142,7 +142,7 @@ class OrderItemCreate(CreateAPIView):
     # queryset = OrderItem.objects.all()
 
 class MyOrdersList(ListAPIView):
-    """Вывод всех заказов по выбранному покупателю через serializer"""
+    """Вывод всех заказов по текущему покупателю через serializer"""
     queryset = Order.objects.all().order_by('id')
     serializer_class = OrderSerializer
 

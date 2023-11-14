@@ -29,7 +29,7 @@ class CategoryTests(APITestCase):
             slug="limonade",
             currentPrice=100,
             is_ready=True,
-            type_product = self.second_category
+            type_product=self.second_category
         )
 
         # пользователь1
@@ -45,20 +45,19 @@ class CategoryTests(APITestCase):
                                  product=self.first_product,
                                  comment="Супер!!!",
                                  user=user_test1
-                                )
+                                 )
         Feedbacks.objects.create(
-                                 buyer='Маша',
-                                 product=self.first_product,
-                                 comment="Отлично!!!",
-                                 user=user_test1
-                                )
+            buyer='Маша',
+            product=self.first_product,
+            comment="Отлично!!!",
+            user=user_test1
+        )
         Feedbacks.objects.create(
-                                 buyer='Оля',
-                                 product=self.second_product,
-                                 comment="Просто отлично!!!",
-                                 user=user_test2
-                                )
-
+            buyer='Оля',
+            product=self.second_product,
+            comment="Просто отлично!!!",
+            user=user_test2
+        )
 
     def test_list_category(self):
         """ Тестирование выдачи полного списка категорий """
@@ -72,7 +71,7 @@ class CategoryTests(APITestCase):
                          'pk': 1,
                          'nameOfType': "Пицца",
                          'slug': "pizza"
-                        } in response.json())
+                         } in response.json())
 
     def test_list_products(self):
         """ Тестирование выдачи списка продуктов (с аутентификацией и без неё)
@@ -88,20 +87,20 @@ class CategoryTests(APITestCase):
         # print(response.data)
         # print(response.json())
         self.assertTrue({'id': 1,
-                          'pk': 1,
-                          'name': 'Пицца Неаполитанская',
-                          'shortName': 'Неаполитанская',
-                          'ingredients': '',
-                          'currentPrice': '1000.00',
-                          'photo': None,
-                          'type_product': 'Пицца',
-                          'adress': '/product/1/'
+                         'pk': 1,
+                         'name': 'Пицца Неаполитанская',
+                         'shortName': 'Неаполитанская',
+                         'ingredients': '',
+                         'currentPrice': '1000.00',
+                         'photo': None,
+                         'type_product': 'Пицца',
+                         'adress': '/product/1/'
                          } in response.json())
 
     def test_product(self):
         """ Тестирование выдачи подробного описания одного выбранного товара """
         url = reverse('product_detail2', kwargs={"pk": self.second_product.id})
-        response = self.client.get(url,  format='json')
+        response = self.client.get(url, format='json')
         serializer_data = ProductDetailSerializer(self.second_product).data
         # print(response.data)
         # print(serializer_data)
@@ -111,7 +110,7 @@ class CategoryTests(APITestCase):
     def test_products_from_category(self):
         """ Тестирование выдачи списка товаров одной выбранной категории """
         url = reverse('products_from_category2', kwargs={"type_product": self.first_category.id})
-        response = self.client.get(url,  format='json')
+        response = self.client.get(url, format='json')
         self.assertEqual(len(response.data), 1)
         self.assertTrue({'id': 1,
                          'pk': 1,
@@ -134,10 +133,10 @@ class CategoryTests(APITestCase):
 
         url = reverse('create_feedback2')  # , kwargs={"product": self.first_product.id})
         data = {
-                'buyer': 'Иван',
-                'product': self.first_product.id,
-                'comment': "Супер!!!"
-               }
+            'buyer': 'Иван',
+            'product': self.first_product.id,
+            'comment': "Супер!!!"
+        }
         response = self.client.post(url, data, format='json')
         # print(response.data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -150,7 +149,6 @@ class CategoryTests(APITestCase):
         # print(response.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
-
 
         url = reverse('list_feedbacks2', kwargs={"product": self.second_product.id})
         response = self.client.get(url, format='json')
@@ -170,4 +168,3 @@ class CategoryTests(APITestCase):
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)  # проверяем кол-во отзывов у второго пользователя
-

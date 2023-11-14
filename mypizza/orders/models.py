@@ -13,14 +13,14 @@ class Order(models.Model):
     postal_code = models.CharField(max_length=20, verbose_name='Почтовый индекс', blank=True)
     city = models.CharField(max_length=100, verbose_name='Город', blank=True)
     created = models.DateTimeField(auto_now_add=True, verbose_name='Заказ создан')
-    updated = models.DateTimeField(auto_now=True, verbose_name='Заказ дополнен')
+    updated = models.DateTimeField(auto_now_add=True, verbose_name='Заказ дополнен')
     paid = models.BooleanField(default=False, verbose_name='Оплачено')
     username = models.CharField(max_length=50, default='admin', verbose_name='Логин')
     # username соответствует имени, под которым пользователь залогинился
     # необходимо для вывода списка заказов конкретного пользователя
     delivered = models.BooleanField(default=False, verbose_name='Доставлен')
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Общая сумма заказа', null=True,
-                                     default=0)
+                                       default=0)
     phone = models.CharField(max_length=20, verbose_name='Телефон заказчика', null=True, default="")
 
     class Meta:
