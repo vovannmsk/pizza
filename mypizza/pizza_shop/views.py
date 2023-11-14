@@ -1,8 +1,8 @@
 from django.contrib.auth import logout, login
 from django.contrib.auth.views import LoginView
-from django.core.mail.backends import console
+# from django.core.mail.backends import console
 from django.shortcuts import render, redirect
-from rest_framework.renderers import TemplateHTMLRenderer
+# from rest_framework.renderers import TemplateHTMLRenderer
 
 # from django.urls import reverse_lazy
 # from django.views.decorators.http import require_POST
@@ -16,10 +16,10 @@ from .serializers import PizzaSerializer, ProductDetailSerializer, FeedbackCreat
     FeedbackViewSerializer, FeedbacksUserSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView   # , ListCreateAPIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework import generics, permissions, viewsets, renderers
-from rest_framework.permissions import IsAuthenticated
+from rest_framework import permissions, viewsets  # , renderers, generics
+# from rest_framework.permissions import IsAuthenticated
 
 # from django_filters.rest_framework import DjangoFilterBackend
 
@@ -100,7 +100,7 @@ class FeedbackViewVS(viewsets.ReadOnlyModelViewSet):
 class PizzaList(APIView):
     """Вывод всех продуктов через serializer"""
 
-    def get(self, request):
+    def get(self):
         products = Pizza.objects.filter(is_ready=True)
         serializer = PizzaSerializer(products, many=True)
         return Response(serializer.data)
@@ -109,7 +109,7 @@ class PizzaList(APIView):
 class ProductDetailView(APIView):
     """Вывод сведений по одному товару (вместе с отзывами по нему)"""
 
-    def get(self, request, pk):
+    def get(self, pk):
         product = Pizza.objects.get(id=pk)
         serializer = ProductDetailSerializer(product)
         return Response(serializer.data)
@@ -118,7 +118,7 @@ class ProductDetailView(APIView):
 class ProductsFromCategory(APIView):
     """Вывод всех продуктов одной категории через serializer"""
 
-    def get(self, request, pk):
+    def get(self, pk):
         products = Pizza.objects.filter(is_ready=True, type_product=pk).order_by('id')
         serializer = PizzaSerializer(products, many=True)
         return Response(serializer.data)
@@ -127,7 +127,7 @@ class ProductsFromCategory(APIView):
 class ListOfCategories(APIView):
     """Вывод всех категорий продуктов через serializer"""
 
-    def get(self, request):
+    def get(self):
         categories = TypeOfProduct.objects.all().order_by('id')
         serializer = CategoriesSerializer(categories, many=True)
         return Response(serializer.data)
@@ -152,7 +152,7 @@ class FeedbackCreate(APIView):
 class FeedbackView(APIView):
     """Вывод отзывов на один товар"""
 
-    def get(self, request, pk):
+    def get(self, pk):
         feedback = Feedbacks.objects.filter(product=pk).order_by('id')
         serializer = FeedbackViewSerializer(feedback, many=True)
         return Response(serializer.data)
@@ -167,9 +167,10 @@ class PizzaList2(ListAPIView):
     serializer_class = PizzaSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
+    # pagination_class = LargeResultsSetPagination
+    # так можно указать класс для разбивки на страницы
+    # ИНДИВИДУАЛЬНО для данного класса
 
-    # pagination_class = LargeResultsSetPagination     # так можно указать класс для разбивки на страницы
-                                                       # ИНДИВИДУАЛЬНО для данного класса
     # renderer_classes = [renderers.JSONRenderer, renderers.BrowsableAPIRenderer]
     # template_name = 'pizza_shop/list2.html'
     # template_name = 'pizza_shop/list_app.html'
@@ -185,6 +186,7 @@ class PizzaList2(ListAPIView):
     #     context['title'] = 'Список пицц для заказа'
     #     context['category'] = 0
     #     return context
+
 
 class ProductDetailView2(RetrieveAPIView):
     """Вывод сведений по одному товару (вместе с отзывами по нему)"""
@@ -212,7 +214,6 @@ class FeedbackCreate2(CreateAPIView):
     serializer_class = FeedbackCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-
     # def post(self, request):
     #     feedback = FeedbackCreateSerializer(data=request.data)
     #     feedback.is_valid(raise_exception=True)
@@ -232,6 +233,7 @@ class FeedbackView2(ListAPIView):
         """'этот метод вместо строки queryset = ... """
         return Feedbacks.objects.filter(product=self.kwargs["product"]).order_by('id')
 
+
 class FeedbacksView(ListAPIView):
     """Вывод отзывов текущего пользователя"""
     serializer_class = FeedbacksUserSerializer
@@ -239,8 +241,6 @@ class FeedbacksView(ListAPIView):
     def get_queryset(self):
         """'этот метод вместо строки queryset = ... """
         return Feedbacks.objects.filter(user=self.request.user.id).select_related('product')
-
-
 
 
 # =====================================================================================================================

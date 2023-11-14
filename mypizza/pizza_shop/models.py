@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse_lazy
-from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.text import slugify
 from django.contrib.auth.models import User
 
@@ -18,8 +17,8 @@ class Pizza(models.Model):
 
     # price = models.DecimalField (max_digits=10, decimal_places=2, verbose_name='Цена', default=1000)
 
-    # здесь мы строим функцию для админки, чтобы при нажатии на товар выскакивал сайт
-    # со страничкой данного товара. в скобочках функции reverse_lazy мы строим маршрут из urls.py
+    # Здесь мы строим функцию для админки, чтобы при нажатии на товар выскакивал сайт
+    # со страничкой данного товара. В скобочках функции reverse_lazy мы строим маршрут из urls.py
     # короче тут строим ссылку на конкретный товар
     def get_absolute_url(self):
         return reverse_lazy('show_product', kwargs={"product_id": self.pk})  # вывод товара без использования REST
@@ -27,7 +26,7 @@ class Pizza(models.Model):
     def __str__(self):
         return self.name
 
-    # автоматическкое создание слага
+    # автоматическое создание slug
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.name)
@@ -44,7 +43,7 @@ class TypeOfProduct(models.Model):
     nameOfType = models.CharField(max_length=50, db_index=True, verbose_name='Тип продукта')
     slug = models.SlugField(max_length=200, unique=True, db_index=True)
 
-    # здесь мы строим функцию для админки, чтобы при нажатии на категорию продуктов выскакивал сайт
+    # Здесь мы строим функцию для админки, чтобы при нажатии на категорию продуктов выскакивал сайт
     # с уже выбранной данной категорией товара. В скобочках функции reverse_lazy мы строим маршрут из urls.py
     def get_absolute_url(self):
         return reverse_lazy('type', kwargs={"type_id": self.pk})
@@ -52,7 +51,7 @@ class TypeOfProduct(models.Model):
     def __str__(self):
         return self.nameOfType
 
-    # автоматическкое создание слага
+    # автоматическое создание slug
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.nameOfType)
@@ -68,19 +67,20 @@ class Feedbacks(models.Model):
     """Отзывы"""
     buyer = models.CharField(max_length=100, db_index=True, null=True,
                              verbose_name='Имя')  # default="Анонимный покупатель"
-    product = models.ForeignKey('Pizza', on_delete=models.PROTECT, verbose_name='Наменование продукта', null=True,
+    product = models.ForeignKey('Pizza', on_delete=models.PROTECT, verbose_name='Наименование продукта', null=True,
                                 related_name="feedbacks")
     comment = models.CharField(max_length=250, db_index=False, verbose_name='Отзыв')
     user = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name='Пользователь', null=True,
                              related_name='users')
 
-    #    buyersname = models.ForeignKey('Buyers', on_delete=models.PROTECT, verbose_name='Имя покупателя', null=True,
+    #    buyers-name = models.ForeignKey('Buyers', on_delete=models.PROTECT, verbose_name='Имя покупателя', null=True,
     #                       default=1)
 
     def get_absolute_url(self):
         return reverse_lazy('show_feedback', kwargs={"feedback_id": self.pk})
 
-    #        return reverse_lazy('show_feedback', args=[str(self.pk)])  # альтернативный вариант через args
+    #   return reverse_lazy('show_feedback', args=[str(self.pk)])
+    #   это альтернативный вариант через args
 
     def __str__(self):
         return self.comment
@@ -93,10 +93,10 @@ class Feedbacks(models.Model):
 # class Order(models.Model):
 # """список заказов. не используется"""
 #     orderNumber = models.IntegerField(verbose_name='Номер заказа', null=True, default=1)
-#     product = models.ForeignKey('Pizza', on_delete=models.PROTECT, verbose_name='Наменование продукта', null=True,
+#     product = models.ForeignKey('Pizza', on_delete=models.PROTECT, verbose_name='Наименование продукта', null=True,
 #                                 default=1)
 #     quantity = models.IntegerField(verbose_name='Количество (шт.)')
-#     buyersname = models.ForeignKey('Buyers', on_delete=models.PROTECT, verbose_name='Имя покупателя', null=True,
+#     buyers-name = models.ForeignKey('Buyers', on_delete=models.PROTECT, verbose_name='Имя покупателя', null=True,
 #                                    default=1)
 #
 #     def __str__(self):
