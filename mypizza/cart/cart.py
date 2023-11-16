@@ -2,6 +2,7 @@ from django.conf import settings
 from pizza_shop.models import Pizza
 from decimal import *
 
+
 class Cart(object):
     def __init__(self, request):
         """
@@ -19,13 +20,13 @@ class Cart(object):
         Add a product to the cart or update its quantity.
         """
         product_id = str(product.id)
-        if product_id not in self.cart:     # если товара еще нет в корзине
+        if product_id not in self.cart:  # если товара еще нет в корзине
             self.cart[product_id] = {'quantity': 0, 'price': str(product.currentPrice)}  # добавляем строчку с товаром
-                                                                                        # и его ценой в корзину
-        if update_quantity:                                     # если нажимали кнопку "обновить"
-            self.cart[product_id]['quantity'] = quantity        # то обновленное количество товара вносимв корзину
-        else:                                                   # а если нажимали кнопку "Добавит в корзину"
-            self.cart[product_id]['quantity'] += quantity       # прибавляем к уже существующему количеству новое кол-во
+            # и его ценой в корзину
+        if update_quantity:  # если нажимали кнопку "обновить"
+            self.cart[product_id]['quantity'] = quantity  # то обновленное количество товара вносим в корзину
+        else:  # а если нажимали кнопку "Добавит в корзину"
+            self.cart[product_id]['quantity'] += quantity  # прибавляем к уже существующему количеству новое кол-во
         self.save()
 
     def save(self):

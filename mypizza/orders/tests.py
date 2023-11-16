@@ -1,17 +1,16 @@
 from django.contrib.auth.models import User
-from django.urls import include, path, reverse
+from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase, APIRequestFactory
-from rest_framework.test import force_authenticate
+from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 
 from pizza_shop.models import TypeOfProduct
 from .models import Pizza
 from .models import OrderItem
 from .models import Order
-from .views import OrderCreate
 
-from .serializers import OrderSerializer, OrderItemCreateSerializer, OrderItemSerializer
+
+# from .serializers import OrderSerializer, OrderItemCreateSerializer, OrderItemSerializer
 
 
 class OrdersTests(APITestCase):
@@ -46,7 +45,7 @@ class OrdersTests(APITestCase):
         self.first_product = Pizza.objects.create(
             name="Пицца Неаполитанская",
             shortName="Неаполитанская",
-            slug="pizza_neapol",
+            slug="pizza_naples",
             currentPrice=1000,
             is_ready=True,
             type_product=self.first_category
@@ -72,9 +71,6 @@ class OrdersTests(APITestCase):
             price=500,
             quantity=2
         )
-
-
-        # Order.objects.create(first_name='Маша', last_name='Петрова', total_amount=2.00)
 
     def test_create_order(self):
         """  Тестируем создание шапки заказа (без списка товаров, т.е. без табличной части) """
@@ -104,7 +100,6 @@ class OrdersTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(OrderItem.objects.count(), 3)
         # print(response.json())
-
 
     def test_orders_list(self):
         """Тест выдачи списка всех заказов текущего пользователя(без товаров)"""
