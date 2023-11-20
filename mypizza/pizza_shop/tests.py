@@ -1,9 +1,9 @@
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.authtoken.models import Token
+# from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
-# from rest_framework_simplejwt.tokens import Token
+
 
 from .models import TypeOfProduct, Pizza, Feedbacks
 from .serializers import ProductDetailSerializer, PizzaSerializer
@@ -18,7 +18,7 @@ class CategoryTests(APITestCase):
         self.first_product = Pizza.objects.create(
             name="Пицца Неаполитанская",
             shortName="Неаполитанская",
-            slug="pizza_neapol",
+            slug="pizza_napoli",
             currentPrice=1000,
             is_ready=True,
             type_product=self.first_category
@@ -33,13 +33,36 @@ class CategoryTests(APITestCase):
         )
 
         # пользователь1
-        user_test1 = User.objects.create_user(username='test2233', password="pass334sa")
+        user_test1 = User.objects.create_user(username='admin', password="111")
         user_test1.save()
-        self.user_test1_token = Token.objects.create(user=user_test1)
+
+        # =================
+        # токен для user1
+        # =================
+
+        # обычная аутентификация 'rest_framework.authentication.TokenAuthentication',
+        # self.user_test1_token = Token.objects.create(user=user_test1)  # для  обычной TokenAuthentication
+
+        # JWT аутентификация
+        url = reverse('get_token')
+        data = {"username": "admin", "password": "111"}
+        self.user_test1_token = self.client.post(url, data, format='json').json().get("access")
+
         # пользователь2
         user_test2 = User.objects.create_user(username='test2332', password="pass334dd")
         user_test2.save()
-        self.user_test2_token = Token.objects.create(user=user_test2)
+
+        # =================
+        # токен для user2
+        # =================
+
+        # обычная аутентификация 'rest_framework.authentication.TokenAuthentication',
+        # self.user_test2_token = Token.objects.create(user=user_test2)
+
+        # JWT аутентификация
+        url = reverse('get_token')
+        data = {"username": "test2332", "password": "pass334dd"}
+        self.user_test2_token = self.client.post(url, data, format='json').json().get("access")
 
         Feedbacks.objects.create(buyer='Иван',
                                  product=self.first_product,
@@ -60,7 +83,7 @@ class CategoryTests(APITestCase):
         )
 
     def test_list_category(self):
-        """ Тестирование выдачи полного списка категорий """
+        """ Тестирование выдачи полного списка категорий /без аутентификации/"""
         url = reverse('categories2')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -74,11 +97,12 @@ class CategoryTests(APITestCase):
                          } in response.json())
 
     def test_list_products(self):
-        """ Тестирование выдачи списка продуктов (с аутентификацией и без неё)
+        """ Тестирование выдачи списка продуктов (с аутентификацией)
          работает только, если в settings.py стоит параметр 'rest_framework.authentication.TokenAuthentication'
          не работает с 'rest_framework_simplejwt.authentication.JWTAuthentication' (JWT нужна для Vue)"""
 
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.user_test1_token)
 
         url = reverse('list_products2')
         response = self.client.get(url, format='json')
@@ -129,7 +153,8 @@ class CategoryTests(APITestCase):
 
     def test_create_feedback(self):
         """ Тестирование создания отзыва на выбранный товар """
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.user_test1_token)
 
         url = reverse('create_feedback2')  # , kwargs={"product": self.first_product.id})
         data = {
@@ -157,14 +182,18 @@ class CategoryTests(APITestCase):
 
     def test_feedbaks_for_user(self):
         """ Тестирование выдачи списка отзывов одного выбранного пользователя """
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.user_test1_token)
+
         url = reverse('list_user_feedbacks')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)  # проверяем кол-во отзывов у первого пользователя
         # print(response.json())
 
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test2_token.key)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test2_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.user_test2_token)
+
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)  # проверяем кол-во отзывов у второго пользователя

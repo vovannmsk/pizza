@@ -165,7 +165,7 @@ class PizzaList2(ListAPIView):
     """Вывод списка всех продуктов через serializer"""
     queryset = Pizza.objects.filter(is_ready=True).order_by('id')
     serializer_class = PizzaSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     # pagination_class = LargeResultsSetPagination
     # так можно указать класс для разбивки на страницы

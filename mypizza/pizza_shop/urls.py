@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework.routers import SimpleRouter
-from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
+# from rest_framework_simplejwt.views import (TokenObtainPairView, TokenRefreshView)
 
 from .views import *
 
@@ -8,8 +8,9 @@ from .views import *
 
 urlpatterns = [
     # аутентификация jwt
-    path('api-token/', TokenObtainPairView.as_view(), name='get_token'),
-    path('api-token-refresh/', TokenRefreshView.as_view(), name='refresh_token'),
+    # path('api-token/', TokenObtainPairView.as_view(), name='get_token'),
+    # path('api-token-refresh/', TokenRefreshView.as_view(), name='refresh_token'),
+
 
     # работа через классы (именно это работает при запуске проги)
     path('', pizza_main, name='home'),

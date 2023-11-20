@@ -17,13 +17,35 @@ class OrdersTests(APITestCase):
 
     def setUp(self):
         # пользователь1
-        user_test1 = User.objects.create_user(username='test2233', password="pass334sa")
+        user_test1 = User.objects.create_user(username='admin', password="111")
         user_test1.save()
-        self.user_test1_token = Token.objects.create(user=user_test1)
+
+        # =================
+        # токен для user1
+        # =================
+
+        # обычная аутентификация 'rest_framework.authentication.TokenAuthentication',
+        # self.user_test1_token = Token.objects.create(user=user_test1)  # для  обычной TokenAuthentication
+
+        # JWT аутентификация
+        url = reverse('get_token')
+        data = {"username": "admin", "password": "111"}
+        self.user_test1_token = self.client.post(url, data, format='json').json().get("access")
+
         # пользователь2
         user_test2 = User.objects.create_user(username='test2332', password="pass334dd")
         user_test2.save()
-        self.user_test2_token = Token.objects.create(user=user_test2)
+        # =================
+        # токен для user2
+        # =================
+
+        # обычная аутентификация 'rest_framework.authentication.TokenAuthentication',
+        # self.user_test2_token = Token.objects.create(user=user_test2)
+
+        # JWT аутентификация
+        url = reverse('get_token')
+        data = {"username": "test2332", "password": "pass334dd"}
+        self.user_test2_token = self.client.post(url, data, format='json').json().get("access")
 
         self.first_order = Order.objects.create(
             first_name='Иван',
@@ -74,7 +96,8 @@ class OrdersTests(APITestCase):
 
     def test_create_order(self):
         """  Тестируем создание шапки заказа (без списка товаров, т.е. без табличной части) """
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.user_test1_token)
 
         url = reverse('create_order')
         data = {'first_name': 'Александр',
@@ -89,7 +112,8 @@ class OrdersTests(APITestCase):
 
     def test_create_items_for_order(self):
         """ Тестирование создания табличной части заказа (товаров, количества, суммы и т.д.) """
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.user_test1_token)
         url = reverse('create_order_items')
         data = {'order': self.first_order.id,
                 'product': self.second_product.id,
@@ -103,7 +127,8 @@ class OrdersTests(APITestCase):
 
     def test_orders_list(self):
         """Тест выдачи списка всех заказов текущего пользователя(без товаров)"""
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        # self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.user_test1_token.key)
+        self.client.credentials(HTTP_AUTHORIZATION='Bearer ' + self.user_test1_token)
 
         url = reverse('my_orders_api')
         response = self.client.get(url, format='json')

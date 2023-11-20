@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+# from rest_framework.authtoken.models import Token
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -58,12 +59,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
 
+    # для токен авторизации
     'rest_framework.authtoken',
+
     # 'djoser',
 
     'ckeditor',
     'ckeditor_uploader',
     'corsheaders',
+
+    # для JWT токен авторизации
     'rest_framework_simplejwt',
 ]
 
@@ -169,7 +174,7 @@ CAPTCHA_FONT_SIZE = 48
 # на стадии отладки используется отправка писем в консоль
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # else:
-# на стадии производсива используется отправка писем через SMTP
+# на стадии производства используется отправка писем через SMTP
 
 # gmail не работает с марта 2022
 # EMAIL_USE_TLS = True
@@ -271,8 +276,9 @@ CKEDITOR_CONFIGS = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        # тесты работают только с аутентификацией строкой выше :)
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         # моё приложение на Vue работает только с JWT
     ),
     'DEFAULT_FILTER_BACKENDS': (

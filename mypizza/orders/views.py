@@ -120,7 +120,9 @@ class OrderCreate(CreateAPIView):
         serializer.save(
             username=self.request.user,
             paid=True,
-            created=datetime.datetime.now())
+            created=datetime.datetime.now(),
+            # updated=datetime.datetime.now(),
+        )
         # добавить сюда и дату создания заказа
 
 
